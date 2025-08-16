@@ -1,7 +1,7 @@
 "use client";
 
 import { type WasmStore } from "@/stores/wasm-store";
-import { WasmStoreContext } from "@/providers";
+import { WasmStoreContext } from "@/providers/wasm-provider";
 import { useContext } from "react";
 import { useStore } from "zustand";
 
