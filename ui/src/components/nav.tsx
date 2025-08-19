@@ -1,15 +1,17 @@
 "use client";
 
+import { debounce } from "@/lib/debounce";
 import { useRecorderStore } from "@/lib/use_store";
 import React, { ChangeEvent, useEffect } from "react";
 
-type Props = {};
-
-const Nav = (props: Props) => {
+const Nav = () => {
+  const isRecording = useRecorderStore((s) => s.is_recording);
   const currDev = useRecorderStore((s) => s.inputDevice);
   const devOptions = useRecorderStore((s) => s.devOptions);
   const updateDevOptions = useRecorderStore((s) => s.updateDevOptions);
   const changeAudioInput = useRecorderStore((s) => s.changeInput);
+  const startRecording = useRecorderStore((s) => s.startRecording);
+  const stopRecording = useRecorderStore((s) => s.stopRecording);
 
   useEffect(() => {
     const updateAudioDevices = async () => {
@@ -29,14 +31,22 @@ const Nav = (props: Props) => {
 
   const changeAudioHandler = (e: ChangeEvent<HTMLSelectElement>) => {
     const val = e.target.value;
-
     changeAudioInput(val);
   };
 
+  const recordHandler = debounce(() => {
+    if (isRecording) stopRecording();
+    else startRecording();
+  });
+
   return (
-    <div>
-      <div className="text-xs">
-        <select onChange={changeAudioHandler} value={currDev}>
+    <div className="flex flex-row text-xs gap-2 flex-wrap items-center py-2">
+      <div className="flex-1">
+        <select
+          name="select_audio_input"
+          onChange={changeAudioHandler}
+          value={currDev}
+        >
           <option value={""} hidden>
             Select default Audio
           </option>
@@ -46,6 +56,16 @@ const Nav = (props: Props) => {
             </option>
           ))}
         </select>
+      </div>
+      <div>
+        <button
+          onClick={recordHandler}
+          className={`${
+            isRecording ? "bg-red-500" : "bg-teal-500"
+          } text-white py-1 px-2 rounded-xl cursor-pointer`}
+        >
+          {!isRecording ? "Record" : "Stop"}
+        </button>
       </div>
     </div>
   );
