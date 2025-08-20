@@ -1,6 +1,7 @@
 "use client";
 
 import Display from "@/components/display";
+import Footer from "@/components/footer";
 import Nav from "@/components/nav";
 import { useWasmStore } from "@/lib/use_store";
 import { useEffect, useRef } from "react";
@@ -23,6 +24,7 @@ export default function Home() {
       <pre ref={consoleRef} />
       <Nav />
       <Display />
+      <Footer />
     </div>
   );
 }

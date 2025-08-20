@@ -10,12 +10,20 @@ import {
 import { StateStorage, createJSONStorage, persist } from "zustand/middleware";
 import { SetRecording } from "./recordings-store";
 
+export type RecordingType = {
+  idx: string;
+  duration: number;
+  channel: number;
+  sampleRate: number;
+  recordedAt: number;
+};
+
 export type RecorderState = {
   inputDevice: string;
   devOptions: MediaDeviceInfo[];
   is_recording: boolean;
   recorder?: MediaRecorder;
-  currRecordedChunks: string[];
+  currRecordedChunks: RecordingType[];
 };
 
 export type RecoderActions = {
@@ -82,24 +90,24 @@ export const createRecorderStore = (
               if (tracks[0].readyState == "live") {
                 const mediaRecoder = new MediaRecorder(stream);
                 const audioCtx = new AudioContext();
-                const analyzer = audioCtx.createAnalyser();
-                const source = audioCtx.createMediaStreamSource(stream);
+                // const analyzer = audioCtx.createAnalyser();
+                // const source = audioCtx.createMediaStreamSource(stream);
 
-                analyzer.fftSize = 2048;
-                const bufferLength = analyzer.frequencyBinCount;
-                const dataArray = new Uint8Array(bufferLength);
+                // analyzer.fftSize = 2048;
+                // const bufferLength = analyzer.frequencyBinCount;
+                // const dataArray = new Uint8Array(bufferLength);
 
-                source.connect(analyzer);
+                // source.connect(analyzer);
 
-                let animatedFrameCount: number;
+                // let animatedFrameCount: number;
 
-                const processFreq = () => {
-                  animatedFrameCount = requestAnimationFrame(processFreq);
-                  analyzer.getByteFrequencyData(dataArray);
-                  console.log(dataArray);
-                };
+                // const processFreq = () => {
+                //   animatedFrameCount = requestAnimationFrame(processFreq);
+                //   analyzer.getByteFrequencyData(dataArray);
+                //   console.log(dataArray);
+                // };
 
-                processFreq();
+                // processFreq();
 
                 set({ is_recording: true, recorder: mediaRecoder });
 
@@ -110,8 +118,23 @@ export const createRecorderStore = (
                   if (e.data && e.data.size > 0) {
                     const idx = await SetRecording(e.data);
 
+                    const audio_ab = await e.data.arrayBuffer();
+                    const audio_buffer = await audioCtx.decodeAudioData(
+                      audio_ab
+                    );
+                    console.log(audio_buffer.duration);
+
                     set((state) => ({
-                      currRecordedChunks: [...state.currRecordedChunks, idx],
+                      currRecordedChunks: [
+                        ...state.currRecordedChunks,
+                        {
+                          idx: idx,
+                          duration: audio_buffer.duration,
+                          channel: audio_buffer.numberOfChannels,
+                          sampleRate: audio_buffer.sampleRate,
+                          recordedAt: Date.now(),
+                        },
+                      ],
                     }));
                     console.log("curr blob: ", e.data);
                   }
@@ -122,12 +145,13 @@ export const createRecorderStore = (
                   recordDataEntryHandler
                 );
 
-                mediaRecoder.onstop = () => {
+                mediaRecoder.onstop = async () => {
                   mediaRecoder.removeEventListener(
                     "dataavailable",
                     recordDataEntryHandler
                   );
-                  cancelAnimationFrame(animatedFrameCount);
+                  await audioCtx.close();
+                  // cancelAnimationFrame(animatedFrameCount);
                 };
               }
             });
