@@ -13,5 +13,8 @@ export const SetRecording = async (data: Blob) => {
 };
 
 export const GetRecording = async (key: string) => {
-  return await get(key, recStore);
+  const data = await get(key, recStore);
+
+  if (!data) return null;
+  return data;
 };
