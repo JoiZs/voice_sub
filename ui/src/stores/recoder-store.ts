@@ -9,6 +9,7 @@ import {
 } from "idb-keyval";
 import { StateStorage, createJSONStorage, persist } from "zustand/middleware";
 import { SetRecording } from "./recordings-store";
+import { WasmMemoryInterface } from "@/lib/wasm_runtime";
 
 export type RecordingType = {
   idx: string;
@@ -29,7 +30,7 @@ export type RecorderState = {
 export type RecoderActions = {
   updateDevOptions: (devs: MediaDeviceInfo[]) => void;
   changeInput: (dev: string) => void;
-  startRecording: () => void;
+  startRecording: (mem: WasmMemoryInterface) => void;
   clearRecording: () => void;
   stopRecording: () => void;
 };
@@ -74,7 +75,7 @@ export const createRecorderStore = (
         changeInput: async (dev: string) => {
           set({ inputDevice: dev });
         },
-        startRecording: async () => {
+        startRecording: async (mem: WasmMemoryInterface) => {
           await navigator.mediaDevices
             .getUserMedia({
               audio: { deviceId: get().inputDevice },
@@ -90,24 +91,51 @@ export const createRecorderStore = (
               if (tracks[0].readyState == "live") {
                 const mediaRecoder = new MediaRecorder(stream);
                 const audioCtx = new AudioContext();
-                // const analyzer = audioCtx.createAnalyser();
-                // const source = audioCtx.createMediaStreamSource(stream);
 
-                // analyzer.fftSize = 2048;
-                // const bufferLength = analyzer.frequencyBinCount;
+                const analyzer = audioCtx.createAnalyser();
+                const source = audioCtx.createMediaStreamSource(stream);
+
+                analyzer.fftSize = 512;
+                const ptr = 1024;
+                const bufferLength = analyzer.frequencyBinCount;
+
+                const currMemLen = mem.mem.byteLength;
+                const memRequired = Math.max(0, 4 * bufferLength - currMemLen);
+                const pageRequired = Math.ceil((ptr + memRequired) / 65536);
+
+                mem.exports.allc_data_size(currMemLen);
+
+                if (pageRequired > 0) {
+                  try {
+                    mem.memory.grow(pageRequired);
+                    console.log(
+                      "Memory grown successfully, pages: ",
+                      pageRequired
+                    );
+                  } catch (e) {
+                    console.log("Failed to grow memory:", e);
+                  }
+                }
+
+                const dataArray = mem.loadF32Array(ptr, bufferLength);
+
                 // const dataArray = new Uint8Array(bufferLength);
 
-                // source.connect(analyzer);
+                source.connect(analyzer);
 
-                // let animatedFrameCount: number;
+                let animatedFrameCount: number;
 
-                // const processFreq = () => {
-                //   animatedFrameCount = requestAnimationFrame(processFreq);
-                //   analyzer.getByteFrequencyData(dataArray);
-                //   console.log(dataArray);
-                // };
+                const processFreq = () => {
+                  animatedFrameCount = requestAnimationFrame(processFreq);
+                  analyzer.getFloatFrequencyData(dataArray);
 
-                // processFreq();
+                  if (dataArray[0] != Infinity)
+                    mem.exports.set_sound_mem(ptr, bufferLength);
+
+                  console.log(dataArray);
+                };
+
+                processFreq();
 
                 set({ is_recording: true, recorder: mediaRecoder });
 
@@ -151,7 +179,7 @@ export const createRecorderStore = (
                     recordDataEntryHandler
                   );
                   await audioCtx.close();
-                  // cancelAnimationFrame(animatedFrameCount);
+                  cancelAnimationFrame(animatedFrameCount);
                 };
               }
             });
