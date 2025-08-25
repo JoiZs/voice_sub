@@ -25,6 +25,11 @@ allc_data_len :: proc() -> int {
 	return len(gctx.data)
 }
 
+@(export)
+set_sound_mem :: proc(ptr: ^f32, len: u32) {
+	mem.copy(raw_data(gctx.data), ptr, int(len * 4))
+}
+
 // draw :: proc() {
 
 // }
