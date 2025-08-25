@@ -40,7 +40,7 @@ const Nav = () => {
   });
 
   return (
-    <div className="flex flex-row text-xs gap-2 flex-wrap items-center py-2">
+    <div className="flex flex-row text-xs gap-2 flex-wrap items-center py-2 w-full">
       <div className="flex-1">
         <select
           name="select_audio_input"

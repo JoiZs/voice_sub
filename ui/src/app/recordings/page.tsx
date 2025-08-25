@@ -2,6 +2,7 @@
 
 import DisplayRecording from "@/components/recording";
 import { useRecorderStore } from "@/lib/use_store";
+import Link from "next/link";
 import React, { Suspense } from "react";
 
 type Props = {};
@@ -18,6 +19,11 @@ const Recordings = (props: Props) => {
         <Suspense fallback={<span>Loading data...</span>}>
           <DisplayRecording recording_idx={recordings} />
         </Suspense>
+      </div>
+      <div className="w-full py-2 text-xs">
+        <Link className="underline italic text-indigo-500" href={"/"}>
+          Home
+        </Link>
       </div>
     </div>
   );

@@ -2,7 +2,7 @@
 
 import { debounce } from "@/lib/debounce";
 import { GetRecording } from "@/stores/recordings-store";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 
 type Props = {
   idx: string;
@@ -19,7 +19,8 @@ const Player = ({ idx }: Props) => {
     isPlaying: false,
     audioSource: undefined,
   });
-  const audioCtx = new AudioContext();
+
+  const audioCtxRef = useRef<AudioContext>(null);
 
   useEffect(() => {
     let cancelled = false;
@@ -36,6 +37,13 @@ const Player = ({ idx }: Props) => {
   const playHandler = debounce(async () => {
     setPlayerConf((prev) => ({ ...prev, isPlaying: !prev.isPlaying }));
     console.log(blobData, playerConf);
+
+    if (!audioCtxRef.current) {
+      audioCtxRef.current = new AudioContext();
+    }
+
+    const audioCtx = audioCtxRef.current;
+
     if (!playerConf.isPlaying && blobData) {
       const audioBuffer = await audioCtx.decodeAudioData(
         await blobData.arrayBuffer()
@@ -47,6 +55,14 @@ const Player = ({ idx }: Props) => {
 
       source.connect(audioCtx.destination);
       source.start(0);
+
+      source.onended = () => {
+        setPlayerConf((prev) => ({
+          ...prev,
+          isPlaying: false,
+          audioSource: undefined,
+        }));
+      };
 
       setPlayerConf((prev) => ({ ...prev, audioSource: source }));
     } else if (playerConf.isPlaying && playerConf.audioSource) {
@@ -60,7 +76,6 @@ const Player = ({ idx }: Props) => {
       <button onClick={playHandler} className="cursor-pointer">
         {playerConf.isPlaying ? "Pause" : "Play"}
       </button>
-      <input type="range" />
     </div>
   );
 };

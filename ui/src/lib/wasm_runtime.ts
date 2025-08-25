@@ -13,6 +13,11 @@ function stripNewline(str) {
 }
 
 export class WasmMemoryInterface {
+  exports;
+  memory;
+  listenerMap;
+  intSize;
+
   constructor() {
     this.memory = null;
     this.exports = null;
