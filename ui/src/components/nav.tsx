@@ -1,7 +1,7 @@
 "use client";
 
 import { debounce } from "@/lib/debounce";
-import { useRecorderStore, useWasmStore } from "@/lib/use_store";
+import { useRecorderStore } from "@/lib/use_store";
 import React, { ChangeEvent, useEffect } from "react";
 
 const Nav = () => {
@@ -12,7 +12,6 @@ const Nav = () => {
   const changeAudioInput = useRecorderStore((s) => s.changeInput);
   const startRecording = useRecorderStore((s) => s.startRecording);
   const stopRecording = useRecorderStore((s) => s.stopRecording);
-  const wasmMem = useWasmStore((s) => s.memory);
 
   useEffect(() => {
     const updateAudioDevices = async () => {
@@ -38,7 +37,7 @@ const Nav = () => {
   const recordHandler = debounce(() => {
     if (isRecording) stopRecording();
     else {
-      if (wasmMem) startRecording(wasmMem);
+      startRecording();
     }
   });
 

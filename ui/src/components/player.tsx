@@ -32,11 +32,9 @@ const Player = ({ idx }: Props) => {
     };
   }, [idx]);
 
-  console.log(blobData);
-
   const playHandler = debounce(async () => {
-    setPlayerConf((prev) => ({ ...prev, isPlaying: !prev.isPlaying }));
-    console.log(blobData, playerConf);
+    console.log(playerConf);
+    // setPlayerConf((prev) => ({ ...prev, isPlaying: !prev.isPlaying }));
 
     if (!audioCtxRef.current) {
       audioCtxRef.current = new AudioContext();
@@ -56,6 +54,12 @@ const Player = ({ idx }: Props) => {
       source.connect(audioCtx.destination);
       source.start(0);
 
+      setPlayerConf((prev) => ({
+        ...prev,
+        audioSource: source,
+        isPlaying: true,
+      }));
+
       source.onended = () => {
         setPlayerConf((prev) => ({
           ...prev,
@@ -63,20 +67,25 @@ const Player = ({ idx }: Props) => {
           audioSource: undefined,
         }));
       };
-
-      setPlayerConf((prev) => ({ ...prev, audioSource: source }));
     } else if (playerConf.isPlaying && playerConf.audioSource) {
       playerConf.audioSource.stop();
-      setPlayerConf((prev) => ({ ...prev, audioSource: undefined }));
+      setPlayerConf((prev) => ({
+        ...prev,
+        audioSource: undefined,
+        isPlaying: false,
+      }));
     }
   });
 
   return (
-    <div className="flex flex-row items-center gap-2 text-xs font-semibold py-4">
-      <button onClick={playHandler} className="cursor-pointer">
-        {playerConf.isPlaying ? "Pause" : "Play"}
-      </button>
-    </div>
+    // <div className="flex flex-row items-center gap-2 text-xs font-semibold p-4 bg-teal-500">
+    <button
+      onClick={playHandler}
+      className="cursor-pointer text-xs font-semibold p-4 bg-teal-500 text-white"
+    >
+      {playerConf.isPlaying ? "Pause" : "Play"}
+    </button>
+    // </div>
   );
 };
 

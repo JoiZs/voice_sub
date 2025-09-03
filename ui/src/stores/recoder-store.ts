@@ -9,7 +9,13 @@ import {
 } from "idb-keyval";
 import { StateStorage, createJSONStorage, persist } from "zustand/middleware";
 import { SetRecording } from "./recordings-store";
-import { WasmMemoryInterface } from "@/lib/wasm_runtime";
+
+type FFTConf = {
+  size: number;
+  maxDec: number;
+  minDec: number;
+  smoothTime: number;
+};
 
 export type RecordingType = {
   idx: string;
@@ -25,14 +31,17 @@ export type RecorderState = {
   is_recording: boolean;
   recorder?: MediaRecorder;
   currRecordedChunks: RecordingType[];
+  fftConf: FFTConf;
+  freqData: null | Float32Array;
 };
 
 export type RecoderActions = {
   updateDevOptions: (devs: MediaDeviceInfo[]) => void;
   changeInput: (dev: string) => void;
-  startRecording: (mem: WasmMemoryInterface) => void;
+  startRecording: () => void;
   clearRecording: () => void;
   stopRecording: () => void;
+  setupFreqData: (bufferLen: number) => Float32Array<ArrayBuffer>;
 };
 
 export type RecorderStore = RecorderState & RecoderActions;
@@ -60,6 +69,13 @@ export const defaultInitState: RecorderState = {
   is_recording: false,
   recorder: undefined,
   currRecordedChunks: [],
+  fftConf: {
+    size: 128,
+    minDec: -90,
+    maxDec: 0,
+    smoothTime: 0.85,
+  },
+  freqData: null,
 };
 
 export const createRecorderStore = (
@@ -75,7 +91,15 @@ export const createRecorderStore = (
         changeInput: async (dev: string) => {
           set({ inputDevice: dev });
         },
-        startRecording: async (mem: WasmMemoryInterface) => {
+        setupFreqData: (bufferLen: number) => {
+          const arrData = new Float32Array(bufferLen);
+          set({
+            freqData: arrData,
+          });
+
+          return arrData;
+        },
+        startRecording: async () => {
           await navigator.mediaDevices
             .getUserMedia({
               audio: { deviceId: get().inputDevice },
@@ -95,44 +119,36 @@ export const createRecorderStore = (
                 const analyzer = audioCtx.createAnalyser();
                 const source = audioCtx.createMediaStreamSource(stream);
 
-                analyzer.fftSize = 512;
-                const ptr = 1024;
-                const bufferLength = analyzer.frequencyBinCount;
-
-                const currMemLen = mem.mem.byteLength;
-                const memRequired = Math.max(0, 4 * bufferLength - currMemLen);
-                const pageRequired = Math.ceil((ptr + memRequired) / 65536);
-
-                mem.exports.allc_data_size(currMemLen);
-
-                if (pageRequired > 0) {
-                  try {
-                    mem.memory.grow(pageRequired);
-                    console.log(
-                      "Memory grown successfully, pages: ",
-                      pageRequired
-                    );
-                  } catch (e) {
-                    console.log("Failed to grow memory:", e);
-                  }
-                }
-
-                const dataArray = mem.loadF32Array(ptr, bufferLength);
-
-                // const dataArray = new Uint8Array(bufferLength);
-
+                analyzer.fftSize = get().fftConf.size;
+                analyzer.maxDecibels = get().fftConf.maxDec;
+                analyzer.minDecibels = get().fftConf.minDec;
+                analyzer.smoothingTimeConstant = get().fftConf.smoothTime;
                 source.connect(analyzer);
+
+                const bufferLength = analyzer.frequencyBinCount;
 
                 let animatedFrameCount: number;
 
+                // let dataArray = mem.loadF32Array(ptr, bufferLength);
+                let dataArray: Float32Array<ArrayBuffer>;
+
+                if (
+                  get().freqData == null ||
+                  get().freqData?.length !== bufferLength
+                ) {
+                  dataArray = get().setupFreqData(bufferLength);
+                }
+
                 const processFreq = () => {
-                  animatedFrameCount = requestAnimationFrame(processFreq);
                   analyzer.getFloatFrequencyData(dataArray);
 
-                  if (dataArray[0] != Infinity)
-                    mem.exports.set_sound_mem(ptr, bufferLength);
+                  // if (dataArray[0] !== -Infinity) {
+                  //   mem.exports.set_sound_mem(ptr, bufferLength);
+                  // }
 
-                  console.log(dataArray);
+                  // console.log(dataArray);
+
+                  animatedFrameCount = requestAnimationFrame(processFreq);
                 };
 
                 processFreq();
@@ -153,6 +169,7 @@ export const createRecorderStore = (
                     console.log(audio_buffer.duration);
 
                     set((state) => ({
+                      is_recording: false,
                       currRecordedChunks: [
                         ...state.currRecordedChunks,
                         {
@@ -178,6 +195,7 @@ export const createRecorderStore = (
                     "dataavailable",
                     recordDataEntryHandler
                   );
+                  stream.getTracks().forEach((track) => track.stop());
                   await audioCtx.close();
                   cancelAnimationFrame(animatedFrameCount);
                 };
@@ -195,7 +213,7 @@ export const createRecorderStore = (
           console.log("Stopped the recording...");
           mediaRecorder.stop();
 
-          set({ is_recording: false, recorder: undefined });
+          set({ is_recording: false, recorder: undefined, freqData: null });
         },
         clearRecording: () => {
           set({ is_recording: false, recorder: undefined });

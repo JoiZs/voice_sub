@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
-import { WasmStoreProvider } from "@/providers/wasm-provider";
 import { RecorderStoreProvider } from "@/providers/recorder-provider";
 
 const geistSans = Geist({
@@ -29,9 +28,7 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased w-full h-screen`}
       >
-        <RecorderStoreProvider>
-          <WasmStoreProvider>{children}</WasmStoreProvider>
-        </RecorderStoreProvider>
+        <RecorderStoreProvider>{children}</RecorderStoreProvider>
       </body>
     </html>
   );
