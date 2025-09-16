@@ -1,0 +1,24 @@
+syntax = "proto3";
+
+package audiosst;
+
+service AudioSTTService {
+    rpc SendAudio(stream AudioFileInfo) returns (AudioSubbedInfo) {}
+}
+
+
+message AudioFileInfo {
+    repeated float audio_buff = 1;
+}
+
+message ResultSegment {
+    string text = 1;
+    string start = 2;
+    string end = 3;
+}
+
+
+message AudioSubbedInfo {
+    string long_text = 1;
+    repeated ResultSegment segments = 2;
+}
