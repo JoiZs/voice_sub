@@ -7,9 +7,8 @@ import grpc
 
 class AudioRPCServer(service_pb2_grpc.AudioSTTServiceServicer):
 
-    def SendAudio(self, request_iterator, context):
-        for i in request_iterator:
-            print(i)
+    def SendAudio(self, request, context):
+        print(request)
 
         return service_pb2.AudioSubbedInfo(long_text="hello", segments=[service_pb2.ResultSegment(text="hey", start="2", end="3")])
 

@@ -9,6 +9,8 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "google-protobuf": "^4.0.0",
+    "grpc-web": "^2.0.2",
     "idb-keyval": "^6.2.2",
     "next": "15.4.6",
     "react": "19.1.0",

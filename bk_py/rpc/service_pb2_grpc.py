@@ -34,7 +34,7 @@ class AudioSTTServiceStub(object):
         Args:
             channel: A grpc.Channel.
         """
-        self.SendAudio = channel.stream_unary(
+        self.SendAudio = channel.unary_unary(
                 '/audiosst.AudioSTTService/SendAudio',
                 request_serializer=service__pb2.AudioFileInfo.SerializeToString,
                 response_deserializer=service__pb2.AudioSubbedInfo.FromString,
@@ -44,7 +44,7 @@ class AudioSTTServiceStub(object):
 class AudioSTTServiceServicer(object):
     """Missing associated documentation comment in .proto file."""
 
-    def SendAudio(self, request_iterator, context):
+    def SendAudio(self, request, context):
         """Missing associated documentation comment in .proto file."""
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
         context.set_details('Method not implemented!')
@@ -53,7 +53,7 @@ class AudioSTTServiceServicer(object):
 
 def add_AudioSTTServiceServicer_to_server(servicer, server):
     rpc_method_handlers = {
-            'SendAudio': grpc.stream_unary_rpc_method_handler(
+            'SendAudio': grpc.unary_unary_rpc_method_handler(
                     servicer.SendAudio,
                     request_deserializer=service__pb2.AudioFileInfo.FromString,
                     response_serializer=service__pb2.AudioSubbedInfo.SerializeToString,
@@ -70,7 +70,7 @@ class AudioSTTService(object):
     """Missing associated documentation comment in .proto file."""
 
     @staticmethod
-    def SendAudio(request_iterator,
+    def SendAudio(request,
             target,
             options=(),
             channel_credentials=None,
@@ -80,8 +80,8 @@ class AudioSTTService(object):
             wait_for_ready=None,
             timeout=None,
             metadata=None):
-        return grpc.experimental.stream_unary(
-            request_iterator,
+        return grpc.experimental.unary_unary(
+            request,
             target,
             '/audiosst.AudioSTTService/SendAudio',
             service__pb2.AudioFileInfo.SerializeToString,

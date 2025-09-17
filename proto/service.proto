@@ -3,7 +3,7 @@ syntax = "proto3";
 package audiosst;
 
 service AudioSTTService {
-    rpc SendAudio(stream AudioFileInfo) returns (AudioSubbedInfo) {}
+    rpc SendAudio(AudioFileInfo) returns (AudioSubbedInfo) {}
 }
 
 
