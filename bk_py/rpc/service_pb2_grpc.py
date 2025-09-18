@@ -3,7 +3,7 @@
 import grpc
 import warnings
 
-import service_pb2 as service__pb2
+from . import service_pb2 as service__pb2
 
 GRPC_GENERATED_VERSION = '1.74.0'
 GRPC_VERSION = grpc.__version__
@@ -37,7 +37,7 @@ class AudioSTTServiceStub(object):
         self.SendAudio = channel.unary_unary(
                 '/audiosst.AudioSTTService/SendAudio',
                 request_serializer=service__pb2.AudioFileInfo.SerializeToString,
-                response_deserializer=service__pb2.AudioSubbedInfo.FromString,
+                response_deserializer=service__pb2.ResponseInfo.FromString,
                 _registered_method=True)
 
 
@@ -56,7 +56,7 @@ def add_AudioSTTServiceServicer_to_server(servicer, server):
             'SendAudio': grpc.unary_unary_rpc_method_handler(
                     servicer.SendAudio,
                     request_deserializer=service__pb2.AudioFileInfo.FromString,
-                    response_serializer=service__pb2.AudioSubbedInfo.SerializeToString,
+                    response_serializer=service__pb2.ResponseInfo.SerializeToString,
             ),
     }
     generic_handler = grpc.method_handlers_generic_handler(
@@ -85,7 +85,7 @@ class AudioSTTService(object):
             target,
             '/audiosst.AudioSTTService/SendAudio',
             service__pb2.AudioFileInfo.SerializeToString,
-            service__pb2.AudioSubbedInfo.FromString,
+            service__pb2.ResponseInfo.FromString,
             options,
             channel_credentials,
             insecure,

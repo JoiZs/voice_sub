@@ -12,9 +12,10 @@ export default function Home() {
     const client = createClient();
 
     const request = new AudioFileInfo();
-    const tempList = new Array(10);
-    tempList.fill(1.0, 0, 10);
-    request.setAudioBuffList(tempList);
+    const tempList = new Uint8Array(10);
+    tempList.fill(6);
+
+    request.setAudioBuff(tempList);
 
     client.sendAudio(request, {}, (err, res) => {
       console.log(res, err);

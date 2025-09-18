@@ -166,6 +166,7 @@ export const createRecorderStore = (
                     const audio_buffer = await audioCtx.decodeAudioData(
                       audio_ab
                     );
+                    console.log(audio_ab);
                     console.log(audio_buffer.duration);
 
                     set((state) => ({

@@ -43,28 +43,28 @@ export class AudioSTTServiceClient {
     '/audiosst.AudioSTTService/SendAudio',
     grpcWeb.MethodType.UNARY,
     service_pb.AudioFileInfo,
-    service_pb.AudioSubbedInfo,
+    service_pb.ResponseInfo,
     (request: service_pb.AudioFileInfo) => {
       return request.serializeBinary();
     },
-    service_pb.AudioSubbedInfo.deserializeBinary
+    service_pb.ResponseInfo.deserializeBinary
   );
 
   sendAudio(
     request: service_pb.AudioFileInfo,
-    metadata?: grpcWeb.Metadata | null): Promise<service_pb.AudioSubbedInfo>;
+    metadata?: grpcWeb.Metadata | null): Promise<service_pb.ResponseInfo>;
 
   sendAudio(
     request: service_pb.AudioFileInfo,
     metadata: grpcWeb.Metadata | null,
     callback: (err: grpcWeb.RpcError,
-               response: service_pb.AudioSubbedInfo) => void): grpcWeb.ClientReadableStream<service_pb.AudioSubbedInfo>;
+               response: service_pb.ResponseInfo) => void): grpcWeb.ClientReadableStream<service_pb.ResponseInfo>;
 
   sendAudio(
     request: service_pb.AudioFileInfo,
     metadata?: grpcWeb.Metadata | null,
     callback?: (err: grpcWeb.RpcError,
-               response: service_pb.AudioSubbedInfo) => void) {
+               response: service_pb.ResponseInfo) => void) {
     if (callback !== undefined) {
       return this.client_.rpcCall(
         this.hostname_ +

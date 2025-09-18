@@ -1,12 +1,12 @@
+from utils.transc import TTSModel
 from conf.logger import logger
-import stable_whisper as sw
+from rpc import server
 
 if __name__ == "__main__":
+    server.serve()
+    # tsm = TTSModel()
 
-    model = sw.load_model("tiny.en", download_root="./model")
+    # res = tsm.transcribe("./asset/media_audio.mp3")
+    # res2 = tsm.transcribe("./asset/media_audio.mp3")
 
-    result = model.transcribe("./asset/media_audio.mp3")
-
-    for i in result:
-        
-        print(i)
+    # print(res, res2)

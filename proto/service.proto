@@ -3,12 +3,11 @@ syntax = "proto3";
 package audiosst;
 
 service AudioSTTService {
-    rpc SendAudio(AudioFileInfo) returns (AudioSubbedInfo) {}
+    rpc SendAudio(AudioFileInfo) returns (ResponseInfo) {}
 }
 
-
 message AudioFileInfo {
-    repeated float audio_buff = 1;
+    bytes audio_buff = 1;
 }
 
 message ResultSegment {
@@ -17,6 +16,16 @@ message ResultSegment {
     string end = 3;
 }
 
+message ResponseInfo {
+    oneof response_oneof{
+        ExceptionMessage e_message = 1;
+        AudioSubbedInfo res_message = 2;
+    }
+}
+
+message ExceptionMessage {
+    string error = 1;
+}
 
 message AudioSubbedInfo {
     string long_text = 1;

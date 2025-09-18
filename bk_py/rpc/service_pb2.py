@@ -24,7 +24,7 @@ _sym_db = _symbol_database.Default()
 
 
 
-DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\rservice.proto\x12\x08\x61udiosst\"#\n\rAudioFileInfo\x12\x12\n\naudio_buff\x18\x01 \x03(\x02\"9\n\rResultSegment\x12\x0c\n\x04text\x18\x01 \x01(\t\x12\r\n\x05start\x18\x02 \x01(\t\x12\x0b\n\x03\x65nd\x18\x03 \x01(\t\"O\n\x0f\x41udioSubbedInfo\x12\x11\n\tlong_text\x18\x01 \x01(\t\x12)\n\x08segments\x18\x02 \x03(\x0b\x32\x17.audiosst.ResultSegment2T\n\x0f\x41udioSTTService\x12\x41\n\tSendAudio\x12\x17.audiosst.AudioFileInfo\x1a\x19.audiosst.AudioSubbedInfo\"\x00\x62\x06proto3')
+DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\rservice.proto\x12\x08\x61udiosst\"#\n\rAudioFileInfo\x12\x12\n\naudio_buff\x18\x01 \x01(\x0c\"9\n\rResultSegment\x12\x0c\n\x04text\x18\x01 \x01(\t\x12\r\n\x05start\x18\x02 \x01(\t\x12\x0b\n\x03\x65nd\x18\x03 \x01(\t\"\x83\x01\n\x0cResponseInfo\x12/\n\te_message\x18\x01 \x01(\x0b\x32\x1a.audiosst.ExceptionMessageH\x00\x12\x30\n\x0bres_message\x18\x02 \x01(\x0b\x32\x19.audiosst.AudioSubbedInfoH\x00\x42\x10\n\x0eresponse_oneof\"!\n\x10\x45xceptionMessage\x12\r\n\x05\x65rror\x18\x01 \x01(\t\"O\n\x0f\x41udioSubbedInfo\x12\x11\n\tlong_text\x18\x01 \x01(\t\x12)\n\x08segments\x18\x02 \x03(\x0b\x32\x17.audiosst.ResultSegment2Q\n\x0f\x41udioSTTService\x12>\n\tSendAudio\x12\x17.audiosst.AudioFileInfo\x1a\x16.audiosst.ResponseInfo\"\x00\x62\x06proto3')
 
 _globals = globals()
 _builder.BuildMessageAndEnumDescriptors(DESCRIPTOR, _globals)
@@ -35,8 +35,12 @@ if not _descriptor._USE_C_DESCRIPTORS:
   _globals['_AUDIOFILEINFO']._serialized_end=62
   _globals['_RESULTSEGMENT']._serialized_start=64
   _globals['_RESULTSEGMENT']._serialized_end=121
-  _globals['_AUDIOSUBBEDINFO']._serialized_start=123
-  _globals['_AUDIOSUBBEDINFO']._serialized_end=202
-  _globals['_AUDIOSTTSERVICE']._serialized_start=204
-  _globals['_AUDIOSTTSERVICE']._serialized_end=288
+  _globals['_RESPONSEINFO']._serialized_start=124
+  _globals['_RESPONSEINFO']._serialized_end=255
+  _globals['_EXCEPTIONMESSAGE']._serialized_start=257
+  _globals['_EXCEPTIONMESSAGE']._serialized_end=290
+  _globals['_AUDIOSUBBEDINFO']._serialized_start=292
+  _globals['_AUDIOSUBBEDINFO']._serialized_end=371
+  _globals['_AUDIOSTTSERVICE']._serialized_start=373
+  _globals['_AUDIOSTTSERVICE']._serialized_end=454
 # @@protoc_insertion_point(module_scope)

@@ -3,3 +3,6 @@ build_react:
 
 build_py:
 	..\bk_py\.venv\Scripts\python.exe -m grpc_tools.protoc -I. --python_out=../bk_py/rpc --pyi_out=../bk_py/rpc --grpc_python_out=../bk_py/rpc service.proto
+
+start_proxy:
+	grpcwebproxy --backend_addr=localhost:50051 --run_tls_server=false --allow_all_origins

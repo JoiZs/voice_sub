@@ -9,8 +9,8 @@ DESCRIPTOR: _descriptor.FileDescriptor
 class AudioFileInfo(_message.Message):
     __slots__ = ("audio_buff",)
     AUDIO_BUFF_FIELD_NUMBER: _ClassVar[int]
-    audio_buff: _containers.RepeatedScalarFieldContainer[float]
-    def __init__(self, audio_buff: _Optional[_Iterable[float]] = ...) -> None: ...
+    audio_buff: bytes
+    def __init__(self, audio_buff: _Optional[bytes] = ...) -> None: ...
 
 class ResultSegment(_message.Message):
     __slots__ = ("text", "start", "end")
@@ -21,6 +21,20 @@ class ResultSegment(_message.Message):
     start: str
     end: str
     def __init__(self, text: _Optional[str] = ..., start: _Optional[str] = ..., end: _Optional[str] = ...) -> None: ...
+
+class ResponseInfo(_message.Message):
+    __slots__ = ("e_message", "res_message")
+    E_MESSAGE_FIELD_NUMBER: _ClassVar[int]
+    RES_MESSAGE_FIELD_NUMBER: _ClassVar[int]
+    e_message: ExceptionMessage
+    res_message: AudioSubbedInfo
+    def __init__(self, e_message: _Optional[_Union[ExceptionMessage, _Mapping]] = ..., res_message: _Optional[_Union[AudioSubbedInfo, _Mapping]] = ...) -> None: ...
+
+class ExceptionMessage(_message.Message):
+    __slots__ = ("error",)
+    ERROR_FIELD_NUMBER: _ClassVar[int]
+    error: str
+    def __init__(self, error: _Optional[str] = ...) -> None: ...
 
 class AudioSubbedInfo(_message.Message):
     __slots__ = ("long_text", "segments")

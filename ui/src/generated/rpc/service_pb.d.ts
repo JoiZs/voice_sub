@@ -3,10 +3,10 @@ import * as jspb from 'google-protobuf'
 
 
 export class AudioFileInfo extends jspb.Message {
-  getAudioBuffList(): Array<number>;
-  setAudioBuffList(value: Array<number>): AudioFileInfo;
-  clearAudioBuffList(): AudioFileInfo;
-  addAudioBuff(value: number, index?: number): AudioFileInfo;
+  getAudioBuff(): Uint8Array | string;
+  getAudioBuff_asU8(): Uint8Array;
+  getAudioBuff_asB64(): string;
+  setAudioBuff(value: Uint8Array | string): AudioFileInfo;
 
   serializeBinary(): Uint8Array;
   toObject(includeInstance?: boolean): AudioFileInfo.AsObject;
@@ -18,7 +18,7 @@ export class AudioFileInfo extends jspb.Message {
 
 export namespace AudioFileInfo {
   export type AsObject = {
-    audioBuffList: Array<number>;
+    audioBuff: Uint8Array | string;
   };
 }
 
@@ -45,6 +45,58 @@ export namespace ResultSegment {
     text: string;
     start: string;
     end: string;
+  };
+}
+
+export class ResponseInfo extends jspb.Message {
+  getEMessage(): ExceptionMessage | undefined;
+  setEMessage(value?: ExceptionMessage): ResponseInfo;
+  hasEMessage(): boolean;
+  clearEMessage(): ResponseInfo;
+
+  getResMessage(): AudioSubbedInfo | undefined;
+  setResMessage(value?: AudioSubbedInfo): ResponseInfo;
+  hasResMessage(): boolean;
+  clearResMessage(): ResponseInfo;
+
+  getResponseOneofCase(): ResponseInfo.ResponseOneofCase;
+
+  serializeBinary(): Uint8Array;
+  toObject(includeInstance?: boolean): ResponseInfo.AsObject;
+  static toObject(includeInstance: boolean, msg: ResponseInfo): ResponseInfo.AsObject;
+  static serializeBinaryToWriter(message: ResponseInfo, writer: jspb.BinaryWriter): void;
+  static deserializeBinary(bytes: Uint8Array): ResponseInfo;
+  static deserializeBinaryFromReader(message: ResponseInfo, reader: jspb.BinaryReader): ResponseInfo;
+}
+
+export namespace ResponseInfo {
+  export type AsObject = {
+    eMessage?: ExceptionMessage.AsObject;
+    resMessage?: AudioSubbedInfo.AsObject;
+  };
+
+  export enum ResponseOneofCase {
+    RESPONSE_ONEOF_NOT_SET = 0,
+    E_MESSAGE = 1,
+    RES_MESSAGE = 2,
+  }
+}
+
+export class ExceptionMessage extends jspb.Message {
+  getError(): string;
+  setError(value: string): ExceptionMessage;
+
+  serializeBinary(): Uint8Array;
+  toObject(includeInstance?: boolean): ExceptionMessage.AsObject;
+  static toObject(includeInstance: boolean, msg: ExceptionMessage): ExceptionMessage.AsObject;
+  static serializeBinaryToWriter(message: ExceptionMessage, writer: jspb.BinaryWriter): void;
+  static deserializeBinary(bytes: Uint8Array): ExceptionMessage;
+  static deserializeBinaryFromReader(message: ExceptionMessage, reader: jspb.BinaryReader): ExceptionMessage;
+}
+
+export namespace ExceptionMessage {
+  export type AsObject = {
+    error: string;
   };
 }
 
