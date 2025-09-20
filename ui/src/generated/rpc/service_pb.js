@@ -319,8 +319,8 @@ proto.audiosst.ResultSegment.prototype.toObject = function(opt_includeInstance) 
 proto.audiosst.ResultSegment.toObject = function(includeInstance, msg) {
   var f, obj = {
 text: jspb.Message.getFieldWithDefault(msg, 1, ""),
-start: jspb.Message.getFieldWithDefault(msg, 2, ""),
-end: jspb.Message.getFieldWithDefault(msg, 3, "")
+start: jspb.Message.getFloatingPointFieldWithDefault(msg, 2, 0.0),
+end: jspb.Message.getFloatingPointFieldWithDefault(msg, 3, 0.0)
   };
 
   if (includeInstance) {
@@ -362,11 +362,11 @@ proto.audiosst.ResultSegment.deserializeBinaryFromReader = function(msg, reader)
       msg.setText(value);
       break;
     case 2:
-      var value = /** @type {string} */ (reader.readString());
+      var value = /** @type {number} */ (reader.readFloat());
       msg.setStart(value);
       break;
     case 3:
-      var value = /** @type {string} */ (reader.readString());
+      var value = /** @type {number} */ (reader.readFloat());
       msg.setEnd(value);
       break;
     default:
@@ -406,15 +406,15 @@ proto.audiosst.ResultSegment.serializeBinaryToWriter = function(message, writer)
     );
   }
   f = message.getStart();
-  if (f.length > 0) {
-    writer.writeString(
+  if (f !== 0.0) {
+    writer.writeFloat(
       2,
       f
     );
   }
   f = message.getEnd();
-  if (f.length > 0) {
-    writer.writeString(
+  if (f !== 0.0) {
+    writer.writeFloat(
       3,
       f
     );
@@ -441,38 +441,38 @@ proto.audiosst.ResultSegment.prototype.setText = function(value) {
 
 
 /**
- * optional string start = 2;
- * @return {string}
+ * optional float start = 2;
+ * @return {number}
  */
 proto.audiosst.ResultSegment.prototype.getStart = function() {
-  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 2, ""));
+  return /** @type {number} */ (jspb.Message.getFloatingPointFieldWithDefault(this, 2, 0.0));
 };
 
 
 /**
- * @param {string} value
+ * @param {number} value
  * @return {!proto.audiosst.ResultSegment} returns this
  */
 proto.audiosst.ResultSegment.prototype.setStart = function(value) {
-  return jspb.Message.setProto3StringField(this, 2, value);
+  return jspb.Message.setProto3FloatField(this, 2, value);
 };
 
 
 /**
- * optional string end = 3;
- * @return {string}
+ * optional float end = 3;
+ * @return {number}
  */
 proto.audiosst.ResultSegment.prototype.getEnd = function() {
-  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 3, ""));
+  return /** @type {number} */ (jspb.Message.getFloatingPointFieldWithDefault(this, 3, 0.0));
 };
 
 
 /**
- * @param {string} value
+ * @param {number} value
  * @return {!proto.audiosst.ResultSegment} returns this
  */
 proto.audiosst.ResultSegment.prototype.setEnd = function(value) {
-  return jspb.Message.setProto3StringField(this, 3, value);
+  return jspb.Message.setProto3FloatField(this, 3, value);
 };
 
 

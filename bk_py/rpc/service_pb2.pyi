@@ -18,9 +18,9 @@ class ResultSegment(_message.Message):
     START_FIELD_NUMBER: _ClassVar[int]
     END_FIELD_NUMBER: _ClassVar[int]
     text: str
-    start: str
-    end: str
-    def __init__(self, text: _Optional[str] = ..., start: _Optional[str] = ..., end: _Optional[str] = ...) -> None: ...
+    start: float
+    end: float
+    def __init__(self, text: _Optional[str] = ..., start: _Optional[float] = ..., end: _Optional[float] = ...) -> None: ...
 
 class ResponseInfo(_message.Message):
     __slots__ = ("e_message", "res_message")

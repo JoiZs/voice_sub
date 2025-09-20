@@ -1,3 +1,6 @@
 grpcio==1.74.0
 grpcio-tools==1.74.0
 stable-ts==2.19.1
+# librosa==0.11.0
+# soundfile==0.13.1
+ffmpeg_python==0.2.0

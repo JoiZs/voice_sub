@@ -26,11 +26,11 @@ export class ResultSegment extends jspb.Message {
   getText(): string;
   setText(value: string): ResultSegment;
 
-  getStart(): string;
-  setStart(value: string): ResultSegment;
+  getStart(): number;
+  setStart(value: number): ResultSegment;
 
-  getEnd(): string;
-  setEnd(value: string): ResultSegment;
+  getEnd(): number;
+  setEnd(value: number): ResultSegment;
 
   serializeBinary(): Uint8Array;
   toObject(includeInstance?: boolean): ResultSegment.AsObject;
@@ -43,8 +43,8 @@ export class ResultSegment extends jspb.Message {
 export namespace ResultSegment {
   export type AsObject = {
     text: string;
-    start: string;
-    end: string;
+    start: number;
+    end: number;
   };
 }
 

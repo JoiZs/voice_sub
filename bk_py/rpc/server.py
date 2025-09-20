@@ -1,5 +1,8 @@
 from concurrent import futures
+import io
 
+import ffmpeg
+import numpy as np
 from regex import R
 from . import service_pb2_grpc
 from . import service_pb2
@@ -14,22 +17,44 @@ class AudioRPCServer(service_pb2_grpc.AudioSTTServiceServicer):
 
     def SendAudio(self, request: service_pb2.AudioFileInfo, context) -> service_pb2.ResponseInfo:
 
-        print(request.ByteSize())
-        print(request.audio_buff)
-        res_message = service_pb2.ResponseInfo()
+        res_info = service_pb2.ResponseInfo()
 
         if (request.ByteSize() <= 0):
-            res_message.e_message.error = "Input must be provided"
-            return res_message
+            res_info.e_message.error = "Input must be provided"
+            return res_info 
 
-        # try:
-        #     res = self.model.transcribe()
-        # except Exception as e :
-        #     print(e)
+        try:
+            input_stream = io.BytesIO(request.audio_buff)
+            out, _ = (
+                        ffmpeg
+                        .input('pipe:0')
+                        .output('pipe:1', format='f32le', acodec='pcm_f32le', ac=1, ar='16000')
+                        .run(input=input_stream.read(), capture_stdout=True, capture_stderr=True)
+                    )
 
-        res_message.res_message.long_text = "sup>?"
+            audio_arr = np.frombuffer(out, np.float32)
 
-        return res_message
+            res = self.model.transcribe(audio_arr)
+            print(res.text, str(res.segments))
+
+            audio_sub = service_pb2.AudioSubbedInfo()
+            audio_sub.long_text = res.text
+
+            print(audio_sub)
+            for i in res.segments:
+                one_seg = audio_sub.segments.add()
+                one_seg.text = i.text
+                one_seg.start = i.start
+                one_seg.end = i.end
+                print("audio_arr: ", i)
+
+            print(audio_sub)
+            res_info.res_message.CopyFrom(audio_sub)
+        except Exception as e :
+            print(e)
+            res_info.e_message.error = str(e)
+
+        return res_info
 
         # return service_pb2.AudioSubbedInfo(long_text="hello", segments=[service_pb2.ResultSegment(text="hey", start="2", end="3")])
 

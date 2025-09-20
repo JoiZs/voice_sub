@@ -1,3 +1,4 @@
+from numpy import ndarray
 import stable_whisper as sw
 
 
@@ -11,7 +12,7 @@ class TTSModel(object):
             cls.instance = super(TTSModel, cls).__new__(cls)
         return cls.instance
 
-    def transcribe(self, path:str) -> "sw.WhisperResult":
-        result = self.model.transcribe(path)
+    def transcribe(self, audio:str | ndarray) -> "sw.WhisperResult":
+        result = self.model.transcribe(audio)
         return result
     

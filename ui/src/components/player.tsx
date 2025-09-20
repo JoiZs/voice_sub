@@ -1,7 +1,10 @@
 "use client";
 
+import { AudioFileInfo } from "@/generated/rpc/service_pb";
+import { AudioSTTServiceClient } from "@/generated/rpc/ServiceServiceClientPb";
 import { debounce } from "@/lib/debounce";
 import { GetRecording } from "@/stores/recordings-store";
+import { createClient } from "@/utils/rpc_client";
 import React, { useEffect, useRef, useState } from "react";
 
 type Props = {
@@ -21,6 +24,7 @@ const Player = ({ idx }: Props) => {
   });
 
   const audioCtxRef = useRef<AudioContext>(null);
+  const sttClientRef = useRef<AudioSTTServiceClient>(null);
 
   useEffect(() => {
     let cancelled = false;
@@ -40,13 +44,26 @@ const Player = ({ idx }: Props) => {
       audioCtxRef.current = new AudioContext();
     }
 
+    if (!sttClientRef.current) {
+      sttClientRef.current = createClient();
+    }
+
     const audioCtx = audioCtxRef.current;
 
     if (!playerConf.isPlaying && blobData) {
-      const audioBuffer = await audioCtx.decodeAudioData(
-        await blobData.arrayBuffer()
-      );
-      console.log(audioBuffer);
+      const uarr = await blobData.arrayBuffer();
+
+      const sstRequest = new AudioFileInfo();
+
+      sstRequest.setAudioBuff(new Uint8Array(uarr));
+
+      sttClientRef.current.sendAudio(sstRequest, {}, (err, res) => {
+        console.log(err, res);
+      });
+
+      console.log("audiobuff: ", uarr);
+
+      const audioBuffer = await audioCtx.decodeAudioData(uarr);
 
       const source = audioCtx.createBufferSource();
       source.buffer = audioBuffer;
