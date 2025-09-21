@@ -3,6 +3,7 @@
 import { AudioFileInfo } from "@/generated/rpc/service_pb";
 import { AudioSTTServiceClient } from "@/generated/rpc/ServiceServiceClientPb";
 import { debounce } from "@/lib/debounce";
+import { useRecorderStore } from "@/lib/use_store";
 import { GetRecording } from "@/stores/recordings-store";
 import { createClient } from "@/utils/rpc_client";
 import React, { useEffect, useRef, useState } from "react";
@@ -17,6 +18,11 @@ type PlayerConf = {
 };
 
 const Player = ({ idx }: Props) => {
+  const setTransc = useRecorderStore((store) => store.setTranscript);
+  const currChunk = useRecorderStore((store) =>
+    store.currRecordedChunks.find((curr) => curr.idx)
+  );
+
   const [blobData, setBlobData] = useState<null | Blob>(null);
   const [playerConf, setPlayerConf] = useState<PlayerConf>({
     isPlaying: false,
@@ -53,13 +59,28 @@ const Player = ({ idx }: Props) => {
     if (!playerConf.isPlaying && blobData) {
       const uarr = await blobData.arrayBuffer();
 
-      const sstRequest = new AudioFileInfo();
+      // transcribe the audio
+      if (currChunk && !currChunk.transcript) {
+        const sstRequest = new AudioFileInfo();
 
-      sstRequest.setAudioBuff(new Uint8Array(uarr));
+        sstRequest.setAudioBuff(new Uint8Array(uarr));
 
-      sttClientRef.current.sendAudio(sstRequest, {}, (err, res) => {
-        console.log(err, res);
-      });
+        sttClientRef.current.sendAudio(sstRequest, {}, (err, res) => {
+          if (!err || !res.getEMessage()) {
+            const currResTransc = res.getResMessage();
+
+            if (!currResTransc) {
+              console.log("No transcript response...");
+              return;
+            }
+            console.log(currResTransc.getSegmentsList());
+            setTransc(idx, {
+              longText: currResTransc.getLongText(),
+              segments: currResTransc.getSegmentsList(),
+            });
+          }
+        });
+      }
 
       console.log("audiobuff: ", uarr);
 
@@ -93,6 +114,10 @@ const Player = ({ idx }: Props) => {
       }));
     }
   });
+
+  if (!currChunk) {
+    return <span>No recording found...</span>;
+  }
 
   return (
     // <div className="flex flex-row items-center gap-2 text-xs font-semibold p-4 bg-teal-500">

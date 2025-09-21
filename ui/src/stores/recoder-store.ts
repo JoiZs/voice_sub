@@ -9,6 +9,7 @@ import {
 } from "idb-keyval";
 import { StateStorage, createJSONStorage, persist } from "zustand/middleware";
 import { SetRecording } from "./recordings-store";
+import { ResultSegment } from "@/generated/rpc/service_pb";
 
 type FFTConf = {
   size: number;
@@ -17,12 +18,18 @@ type FFTConf = {
   smoothTime: number;
 };
 
+export type TranscType = {
+  longText: string;
+  segments: Array<ResultSegment>;
+};
+
 export type RecordingType = {
   idx: string;
   duration: number;
   channel: number;
   sampleRate: number;
   recordedAt: number;
+  transcript: TranscType | null;
 };
 
 export type RecorderState = {
@@ -42,6 +49,7 @@ export type RecoderActions = {
   clearRecording: () => void;
   stopRecording: () => void;
   setupFreqData: (bufferLen: number) => Float32Array<ArrayBuffer>;
+  setTranscript: (idx: string, trans: TranscType) => void;
 };
 
 export type RecorderStore = RecorderState & RecoderActions;
@@ -90,6 +98,26 @@ export const createRecorderStore = (
         },
         changeInput: async (dev: string) => {
           set({ inputDevice: dev });
+        },
+        setTranscript: (idx: string, trans: TranscType) => {
+          set((state) => {
+            const updatedOne = state.currRecordedChunks.find(
+              (curr) => curr.idx == idx
+            );
+
+            if (!updatedOne) {
+              return state;
+            }
+
+            updatedOne.transcript = trans;
+
+            return {
+              currRecordedChunks: [
+                ...state.currRecordedChunks.filter((curr) => curr.idx !== idx),
+                updatedOne,
+              ],
+            };
+          });
         },
         setupFreqData: (bufferLen: number) => {
           const arrData = new Float32Array(bufferLen);
@@ -179,6 +207,7 @@ export const createRecorderStore = (
                           channel: audio_buffer.numberOfChannels,
                           sampleRate: audio_buffer.sampleRate,
                           recordedAt: Date.now(),
+                          transcript: null,
                         },
                       ],
                     }));

@@ -40,13 +40,11 @@ class AudioRPCServer(service_pb2_grpc.AudioSTTServiceServicer):
             audio_sub = service_pb2.AudioSubbedInfo()
             audio_sub.long_text = res.text
 
-            print(audio_sub)
             for i in res.segments:
                 one_seg = audio_sub.segments.add()
                 one_seg.text = i.text
                 one_seg.start = i.start
                 one_seg.end = i.end
-                print("audio_arr: ", i)
 
             print(audio_sub)
             res_info.res_message.CopyFrom(audio_sub)
