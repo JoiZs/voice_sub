@@ -50,6 +50,7 @@ export type RecoderActions = {
   stopRecording: () => void;
   setupFreqData: (bufferLen: number) => Float32Array<ArrayBuffer>;
   setTranscript: (idx: string, trans: TranscType) => void;
+  getTranscript: (idx: string) => TranscType | undefined | null;
 };
 
 export type RecorderStore = RecorderState & RecoderActions;
@@ -98,6 +99,10 @@ export const createRecorderStore = (
         },
         changeInput: async (dev: string) => {
           set({ inputDevice: dev });
+        },
+        getTranscript: (idx: string) => {
+          return get().currRecordedChunks.find((el) => el.idx == idx)
+            ?.transcript;
         },
         setTranscript: (idx: string, trans: TranscType) => {
           set((state) => {
